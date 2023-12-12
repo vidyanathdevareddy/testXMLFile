@@ -1,17 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<mule xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:http="http://www.mulesoft.org/schema/mule/http"
-	xmlns="http://www.mulesoft.org/schema/mule/core"
-	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
-http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd">
-	<configuration-properties doc:name="Configuration properties" doc:id="0656042c-f751-474a-90fb-aaec39c07141" file="default-properties.yaml" />
-	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="8288702f-f4fe-40bb-ac7f-4ab7365378d0" >
-		<http:listener-connection port="${http.port}" host="${api.http.listener.host}"/>
-	</http:listener-config>
-	<apikit:config outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" doc:name="api-config" doc:id="e781ef6a-4a3f-40a9-bc54-9350eb296e34" name="api-config" raml="api.raml" queryParamsStrictValidation="true">
-		<apikit:flow-mappings >
-			<apikit:flow-mapping resource="/customers/{customerId}" action="get" flow-ref="get:\customers\(customerId):api-config" />
-		</apikit:flow-mappings>
-	</apikit:config>
+<mule xmlns:api-gateway="http://www.mulesoft.org/schema/mule/api-gateway" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:oauth="http://www.mulesoft.org/schema/mule/oauth" xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd http://www.mulesoft.org/schema/mule/oauth http://www.mulesoft.org/schema/mule/oauth/current/mule-oauth.xsd
+http://www.mulesoft.org/schema/mule/api-gateway http://www.mulesoft.org/schema/mule/api-gateway/current/mule-api-gateway.xsd">
+    <configuration-properties doc:name="Configuration properties" doc:id="eb58845b-89d2-4121-aa0d-9daf4a1f5c1e" file="default-properties.yaml" />
+    <http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="3c4d1028-d042-4d8d-8110-b06e39d68378">
+        <http:listener-connection port="${http.port}" host="${api.http.listener.host}" />
+    </http:listener-config>
+    <apikit:config name="api-config" api="resource::c83a2291-ce49-4c83-a453-39a63be34c6c:ucars-sapi:1.0.1:raml:zip:api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+    <http:request-config name="http-request-configuration" doc:name="HTTP Request configuration" doc:id="830a73b7-e28c-4287-8353-471fa241f71e" basePath="${http.requester.ucars.basePath}">
+        <http:request-connection protocol="HTTPS" host="${http.requester.ucars.host}" port="${http.requester.ucars.port}">
+        </http:request-connection>
+		<http:default-headers >
+			<http:default-header key="X-Api-Key" value="${secure::http.requester.ucars.key}" />
+		</http:default-headers>
+    </http:request-config>
+    <secure-properties:config name="secure-properties-config" doc:name="Secure Properties Config" doc:id="5e8d75f6-956f-4e88-8c94-85cd057bf6fd" file="secure-properties.yaml" key="${encryption.key}">
+        <secure-properties:encrypt algorithm="Blowfish" />
+    </secure-properties:config>
+	<api-gateway:autodiscovery apiId="${api.instanceId}" ignoreBasePath="true" doc:name="API Autodiscovery" doc:id="b319897d-2da3-4c36-9307-74aac473f654" flowRef="api-main" />
 </mule>

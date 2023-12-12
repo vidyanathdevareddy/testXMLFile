@@ -1,22 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
-	xmlns="http://www.mulesoft.org/schema/mule/core"
-	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
-http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd">
-	<sub-flow name="get-customer-by-id-subflow" doc:id="b230e916-df94-4104-914c-e97b9600c00a" >
-		<ee:transform doc:name="Default Response" doc:id="9dccabc4-c7fc-4414-b381-c6647c933a49" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
-			<ee:message>
-				<ee:set-payload><![CDATA[%dw 2.0
-output application/json
+http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<sub-flow name="get-vehicle-details-by-vin-subflow" doc:id="3711bd7e-a6ad-4758-9e8a-4382b5a3434a" >
+		<flow-ref doc:name="Get Vehicle Details from Ucars" doc:id="0106e461-d66f-45db-aa88-2dca329e87a0" name="get-vehicle-details-from-ucars-subflow"/>
+		<ee:transform doc:name="Build vehicle details response" doc:id="e4fc52af-7c92-496c-a151-4839e07e0b00" >
+					<ee:message >
+						<ee:set-payload resource="dataweaves/map-vehicle-details-response-to-idm.dwl" />
+					</ee:message>
+				</ee:transform>
+	</sub-flow>
+	<sub-flow name="get-vehicle-details-from-ucars-subflow" doc:id="f5ced602-9585-4428-990b-fbf838272901" >
+		<until-successful maxRetries="2" doc:name="Until Successful" doc:id="26a6a392-f629-41a0-a97d-995ab182e66c" millisBetweenRetries="2000">
+			<http:request method="GET" doc:name="Get Vehicle Details" doc:id="78dde098-1511-4d89-b306-943cbc70af49" config-ref="http-request-configuration" path="/used-vehicle-pricing/v1/cbp/price">
+				<http:query-params ><![CDATA[#[output application/java
 ---
 {
-  firstname: "John",
-  surname: "Snow",
-  title: "Mr."
-}]]></ee:set-payload>
-			</ee:message>
-		</ee:transform>
+	"conditionGrade" : '99',
+	"mileage" : attributes.queryParams.odometerMilage,
+	"mbfsDealerID" : attributes.queryParams.dealerNumber,
+	"zip" : attributes.queryParams.dealerZip,
+	"vin" : attributes.uriParams.vin
+}]]]></http:query-params>
+				</http:request>
+		</until-successful>
+		<choice doc:name="Choice" doc:id="1b2c95af-d4a9-4683-b3ef-e2a3d4ede6cc" >
+			<when expression="#[attributes.statusCode != 200]">
+				<logger level="INFO" doc:name="Log Error" doc:id="5a02e176-2dd6-49b9-8158-8a00f1bec9db" message="#[payload]"/>
+				<raise-error doc:name="Raise error" doc:id="e8fc964e-1e53-4d39-91eb-aad6b6e85009" type="ORG_MB:LOCAL_LANDSCAPE_CALL_UNSUCCESSFUL" description="Call to UCars was unsuccessful"/>
+			</when>
+		</choice>
 	</sub-flow>
+	
 </mule>

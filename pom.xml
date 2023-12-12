@@ -3,16 +3,15 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.mercedes-benz</groupId>
-	<artifactId>mule-restful-api-template</artifactId>
-	<version>1.0.0</version>
+	<artifactId>ucars-sapi</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
 	<packaging>mule-application</packaging>
 
-	<name>mule-restful-api-template</name>
-	
+	<name>ucars-sapi</name>
 	<scm>
-		<developerConnection>scm:git:https://git.i.mercedes-benz.com/mbfs-OneOps/T1224-OneOPS_mule-restful-api-template.git</developerConnection>
-		<connection>scm:git:https://git.i.mercedes-benz.com/mbfs-OneOps/T1224-OneOPS_mule-restful-api-template.git</connection>
-		<tag>mule-restful-api-template-1.0.0</tag>
+		<developerConnection>scm:git:https://git.i.mercedes-benz.com/mbfs-OneOps/ucars-sapi.git</developerConnection>
+		<connection>scm:git:https://git.i.mercedes-benz.com/mbfs-OneOps/ucars-sapi.git</connection>
+		<tag>ucars-sapi-1.0.0</tag>
 	</scm>
 
 	<distributionManagement>
@@ -32,10 +31,10 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-		<app.runtime>4.4.0-20230123</app.runtime>
-		<mule.maven.plugin.version>3.8.2</mule.maven.plugin.version>
+		<app.runtime>4.4.0-20230616</app.runtime>
+		<mule.maven.plugin.version>3.8.7</mule.maven.plugin.version>
 		<api.build.version>v1</api.build.version>
-		<munit.version>2.3.15</munit.version>
+		<munit.version>2.3.18</munit.version>
 		<sonar.language>mule4</sonar.language>
 		<sonar.sources>src/main/mule</sonar.sources>
 	</properties>
@@ -99,14 +98,9 @@
 						<formats>
 							<format>html</format>
 						</formats>
-						<ignoreFlows>
-							<ignoreFlow>api-main</ignoreFlow>
-							<ignoreFlow>api-console</ignoreFlow>
-							<ignoreFlow>global-prepare-error-response-sub-flow</ignoreFlow>
-							<ignoreFlow>global-error-handler</ignoreFlow>
-						</ignoreFlows>
 						<ignoreFiles>
 							<ignoreFile>api.xml</ignoreFile>
+							<ignoreFile>error-handling.xml</ignoreFile>
 						</ignoreFiles>
 					</coverage>
 				</configuration>
@@ -130,7 +124,7 @@
 					<checkModificationExcludes>
 						<checkModificationExclude>pom.xml</checkModificationExclude>
 					</checkModificationExcludes>
-<!-- 					<goals>deploy mule:deploy</goals> -->
+					<!-- 					<goals>deploy mule:deploy</goals> -->
 				</configuration>
 			</plugin>
 		</plugins>
@@ -161,18 +155,6 @@
 			<classifier>mule-plugin</classifier>
 		</dependency>
 		<dependency>
-			<groupId>org.mule.module</groupId>
-			<artifactId>mule-java-module</artifactId>
-			<version>1.2.10</version>
-			<classifier>mule-plugin</classifier>
-		</dependency>
-		<dependency>
-			<groupId>org.mule.connectors</groupId>
-			<artifactId>mule-db-connector</artifactId>
-			<version>1.14.0</version>
-			<classifier>mule-plugin</classifier>
-		</dependency>
-		<dependency>
 			<groupId>com.mulesoft.munit</groupId>
 			<artifactId>munit-runner</artifactId>
 			<version>2.3.15</version>
@@ -187,10 +169,47 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
+			<groupId>org.mule.module</groupId>
+			<artifactId>mule-java-module</artifactId>
+			<version>1.2.11</version>
+			<classifier>mule-plugin</classifier>
+		</dependency>
+		<dependency>
+			<groupId>org.mule.connectors</groupId>
+			<artifactId>mule-db-connector</artifactId>
+			<version>1.14.3</version>
+			<classifier>mule-plugin</classifier>
+		</dependency>
+		<dependency>
 			<groupId>org.mule.modules</groupId>
 			<artifactId>mule-apikit-module</artifactId>
-			<version>1.8.3</version>
+			<version>1.9.1</version>
 			<classifier>mule-plugin</classifier>
+		</dependency>
+		<dependency>
+			<groupId>com.mulesoft.modules</groupId>
+			<artifactId>mule-secure-configuration-property-module</artifactId>
+			<version>1.2.5</version>
+			<classifier>mule-plugin</classifier>
+		</dependency>
+		<dependency>
+			<groupId>com.mulesoft.modules</groupId>
+			<artifactId>mule-secure-configuration-property-module</artifactId>
+			<version>1.2.5</version>
+			<classifier>mule-plugin</classifier>
+		</dependency>
+		<dependency>
+			<groupId>org.mule.modules</groupId>
+			<artifactId>mule-oauth-module</artifactId>
+			<version>1.1.20</version>
+			<classifier>mule-plugin</classifier>
+		</dependency>
+		<dependency>
+			<groupId>c83a2291-ce49-4c83-a453-39a63be34c6c</groupId>
+			<artifactId>ucars-sapi</artifactId>
+			<version>1.0.1</version>
+			<classifier>raml</classifier>
+			<type>zip</type>
 		</dependency>
 	</dependencies>
 
@@ -226,5 +245,4 @@
 			</snapshots>
 		</pluginRepository>
 	</pluginRepositories>
-
 </project>
